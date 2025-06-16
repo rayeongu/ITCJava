@@ -129,6 +129,7 @@ public class Timetable {
 		JSeparator separator = new JSeparator();
 		toolBar.add(separator);
 
+		toolBar.addSeparator();
 		JButton btnLogOut = new JButton("로그아웃");
 		btnLogOut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

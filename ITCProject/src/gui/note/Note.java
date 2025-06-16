@@ -101,9 +101,23 @@ public class Note {
 		});
 		toolBar.add(btnNewButton_1);
 
+		toolBar.addSeparator();
+
+		JButton btnNewButton_3 = new JButton("새로고침");
+		btnNewButton_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				refreshTable();
+				selectedNo = -1;
+			}
+		});
+		toolBar.add(btnNewButton_3);
+
+		toolBar.addSeparator();
+
 		JSeparator separator = new JSeparator();
 		toolBar.add(separator);
 
+		toolBar.addSeparator();
 		JButton btnNewButton_2 = new JButton("돌아가기");
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -139,7 +153,7 @@ public class Note {
 
 		cbCategory = new JComboBox();
 		cbCategory.setModel(new DefaultComboBoxModel(new String[] { "type", "period", "content", "status" }));
-		cbCategory.setBounds(350, 65, 90, 24);
+		cbCategory.setBounds(280, 55, 90, 35);
 		panel.add(cbCategory);
 
 		tfSearch = new JTextField();
@@ -149,7 +163,7 @@ public class Note {
 				searchTable();
 			}
 		});
-		tfSearch.setBounds(452, 66, 362, 24);
+		tfSearch.setBounds(382, 56, 412, 34);
 		panel.add(tfSearch);
 		tfSearch.setColumns(10);
 

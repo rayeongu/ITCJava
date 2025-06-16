@@ -54,7 +54,7 @@ public class Login {
 		frame.getContentPane().setLayout(null);
 
 		JLabel lblLogo = new JLabel("");
-		lblLogo.setIcon(new ImageIcon(Login.class.getResource("/images/logo.png")));
+		lblLogo.setIcon(new ImageIcon("C:\\Users\\PC\\Desktop\\logo.png"));
 		lblLogo.setBounds(40, 65, 90, 90);
 		frame.getContentPane().add(lblLogo);
 
