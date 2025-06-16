@@ -1,4 +1,4 @@
-package db.gui.login;
+package gui.login;
 
 import java.awt.EventQueue;
 
@@ -141,7 +141,7 @@ public class SignUp {
 		btnSignUp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!isIdChecked) {
-					JOptionPane.showMessageDialog(frame, "중복확인을 먼저 진행하세요.");
+					JOptionPane.showMessageDialog(frame, "중복확인을 먼c저 진행하세요.");
 					return;
 				}
 
