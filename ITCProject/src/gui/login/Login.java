@@ -63,7 +63,8 @@ public class Login {
 		frame.getContentPane().setLayout(null);
 
 		JLabel lblLogo = new JLabel("");
-		lblLogo.setIcon(new ImageIcon("C:\\Users\\PC\\Documents\\GitHub\\ITCJava\\ITCProject\\src\\images\\logo.png")); // 절대 경로
+		lblLogo.setIcon(new ImageIcon("C:\\Users\\PC\\Documents\\GitHub\\ITCJava\\ITCProject\\src\\images\\logo.png")); // 절대
+																														// 경로
 		lblLogo.setBounds(40, 50, 120, 120);
 		frame.getContentPane().add(lblLogo);
 
