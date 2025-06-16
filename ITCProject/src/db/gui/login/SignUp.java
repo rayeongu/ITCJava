@@ -28,6 +28,8 @@ public class SignUp {
 
 	private Connection conn;
 
+	private boolean isIdChecked = false;
+
 	/**
 	 * Launch the application.
 	 */
@@ -138,6 +140,11 @@ public class SignUp {
 		JButton btnSignUp = new JButton("회원가입");
 		btnSignUp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (!isIdChecked) {
+					JOptionPane.showMessageDialog(frame, "중복확인을 먼저 진행하세요.");
+					return;
+				}
+
 				try {
 					String sql = "INSERT INTO itc_db.student_info (id, password, name, dept, grade) VALUES(?, ?, ?, ?, ?)";
 					PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -150,9 +157,7 @@ public class SignUp {
 					pstmt.execute();
 
 					JOptionPane.showMessageDialog(frame, "회원가입 성공");
-
 					pstmt.close();
-
 					frame.setVisible(false);
 				} catch (SQLException e1) {
 					e1.printStackTrace();
@@ -160,6 +165,7 @@ public class SignUp {
 				}
 			}
 		});
+
 		btnSignUp.setBounds(120, 270, 100, 30);
 		frame.getContentPane().add(btnSignUp);
 
