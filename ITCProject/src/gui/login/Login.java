@@ -1,19 +1,31 @@
-package db.gui.login;
+package gui.login;
 
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.ImageIcon;
 import javax.swing.JTextField;
+
+import db.DBConn;
+import gui.Timetable;
 
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.awt.event.ActionEvent;
 
 public class Login {
 
 	private JFrame frame;
 	private JTextField tfId;
 	private JPasswordField Pw;
+	private Connection conn;
 
 	/**
 	 * Launch the application.
@@ -37,6 +49,7 @@ public class Login {
 	 */
 	public Login() {
 		initialize();
+		conn = DBConn.init();
 	}
 
 	/**
@@ -50,7 +63,7 @@ public class Login {
 		frame.getContentPane().setLayout(null);
 
 		JLabel lblLogo = new JLabel("");
-		lblLogo.setIcon(null);
+		lblLogo.setIcon(new ImageIcon("C:\\Users\\PC\\Documents\\GitHub\\ITCJava\\ITCProject\\src\\images\\logo.png")); // 절대 경로
 		lblLogo.setBounds(40, 50, 120, 120);
 		frame.getContentPane().add(lblLogo);
 
@@ -72,11 +85,55 @@ public class Login {
 		frame.getContentPane().add(Pw);
 
 		JButton btnLogin = new JButton("로그인");
+		btnLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				try {
+					String sql = "SELECT * FROM itc_db.student_info WHERE id=? AND password=?";
+					PreparedStatement pstmt = conn.prepareStatement(sql);
+					pstmt.setString(1, tfId.getText());
+					pstmt.setString(2, Pw.getText());
+
+					ResultSet rs = pstmt.executeQuery();
+
+					if (rs.next()) {
+						int id = rs.getInt("id");
+						LoginSession.loginId = id;
+
+						rs.close();
+						pstmt.close();
+
+						Timetable timetable = new Timetable();
+						timetable.getFrame().setLocationRelativeTo(null);
+						timetable.getFrame().setVisible(true);
+						frame.setVisible(false);
+					} else {
+						JOptionPane.showMessageDialog(frame, "아이디 또는 비밀번호가 일치하지 않습니다.");
+						rs.close();
+						pstmt.close();
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(frame, "데이터베이스 오류가 발생했습니다.");
+				}
+			}
+		});
 		btnLogin.setBounds(140, 200, 100, 40);
 		frame.getContentPane().add(btnLogin);
 
 		JButton btnSignUp = new JButton("회원가입");
+		btnSignUp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SignUp signUp = new SignUp();
+				signUp.getFrame().setLocationRelativeTo(null);
+				signUp.getFrame().setVisible(true);
+			}
+		});
 		btnSignUp.setBounds(260, 200, 100, 40);
 		frame.getContentPane().add(btnSignUp);
+	}
+
+	public JFrame getFrame() {
+		return frame;
 	}
 }
