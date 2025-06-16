@@ -54,8 +54,8 @@ public class Login {
 		frame.getContentPane().setLayout(null);
 
 		JLabel lblLogo = new JLabel("");
-		lblLogo.setIcon(new ImageIcon(""));
-		lblLogo.setBounds(40, 50, 120, 120);
+		lblLogo.setIcon(new ImageIcon("C:\\Users\\PC\\Desktop\\logo.png"));
+		lblLogo.setBounds(40, 65, 90, 90);
 		frame.getContentPane().add(lblLogo);
 
 		JLabel lblId = new JLabel("학번(ID)");

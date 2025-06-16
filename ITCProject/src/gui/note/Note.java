@@ -1,32 +1,49 @@
 package gui.note;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
 import java.awt.BorderLayout;
-import javax.swing.JToolBar;
-import javax.swing.ScrollPaneConstants;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.Vector;
+
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.table.DefaultTableModel;
 
+import db.DBConn;
 import gui.Timetable;
-
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.JSeparator;
-import javax.swing.JLabel;
-import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import gui.login.LoginSession;
 
 public class Note {
 
 	private JFrame frame;
 	private JTable table;
 	private JTextField tfSearch;
+	private Connection conn;
+	private int selectedNo = -1;
+	private DefaultTableModel tableModel = new DefaultTableModel();
+	private JComboBox cbCategory;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -43,7 +60,9 @@ public class Note {
 	}
 
 	public Note() {
+		conn = DBConn.init();
 		initialize();
+		refreshTable();
 	}
 
 	private void initialize() {
@@ -59,7 +78,9 @@ public class Note {
 		JButton btnNewButton = new JButton("새 노트");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				AddNoteDialog addNoteDialog = new AddNoteDialog(Note.this);
+				addNoteDialog.getFrame().setLocationRelativeTo(null);
+				addNoteDialog.getFrame().setVisible(true);
 			}
 		});
 		toolBar.add(btnNewButton);
@@ -69,7 +90,13 @@ public class Note {
 		JButton btnNewButton_1 = new JButton("노트 수정");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				if (selectedNo == -1) {
+					JOptionPane.showMessageDialog(frame, "수정할 노트를 선택하세요.");
+					return;
+				}
+				EditNoteDialog editNoteDialog = new EditNoteDialog(Note.this, selectedNo);
+				editNoteDialog.getFrame().setLocationRelativeTo(null);
+				editNoteDialog.getFrame().setVisible(true);
 			}
 		});
 		toolBar.add(btnNewButton_1);
@@ -83,6 +110,7 @@ public class Note {
 				Timetable timetable = new Timetable();
 				timetable.getFrame().setLocationRelativeTo(null);
 				timetable.getFrame().setVisible(true);
+				frame.setVisible(false);
 			}
 		});
 		toolBar.add(btnNewButton_2);
@@ -96,16 +124,32 @@ public class Note {
 		scrollPane.setBounds(40, 100, 754, 400);
 		panel.add(scrollPane);
 
-		table = new JTable();
-		table.setModel(new DefaultTableModel(new Object[][] {}, new String[] {}));
+		table = new JTable(tableModel);
+		table.setFont(new Font("굴림", Font.PLAIN, 16));
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int row = table.getSelectedRow();
+				if (row != -1) {
+					selectedNo = Integer.parseInt(table.getValueAt(row, 0).toString());
+				}
+			}
+		});
 		scrollPane.setViewportView(table);
 
-		JComboBox cb = new JComboBox();
-		cb.setBounds(350, 65, 70, 24);
-		panel.add(cb);
+		cbCategory = new JComboBox();
+		cbCategory.setModel(new DefaultComboBoxModel(new String[] { "type", "period", "content", "status" }));
+		cbCategory.setBounds(350, 65, 90, 24);
+		panel.add(cbCategory);
 
 		tfSearch = new JTextField();
-		tfSearch.setBounds(432, 66, 362, 24);
+		tfSearch.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				searchTable();
+			}
+		});
+		tfSearch.setBounds(452, 66, 362, 24);
 		panel.add(tfSearch);
 		tfSearch.setColumns(10);
 
@@ -113,7 +157,58 @@ public class Note {
 		lblTitle.setFont(new Font("굴림", Font.BOLD, 32));
 		lblTitle.setBounds(40, 35, 280, 50);
 		panel.add(lblTitle);
+	}
 
+	private void searchTable() {
+		String category = (String) cbCategory.getSelectedItem();
+		String search = tfSearch.getText();
+		try {
+			String sql = "SELECT * FROM note WHERE id = ? AND " + category + " LIKE ?";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, LoginSession.loginId);
+			pstmt.setString(2, "%" + search + "%");
+			ResultSet rs = pstmt.executeQuery();
+			setTableFromDB(rs);
+			rs.close();
+			pstmt.close();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	public void refreshTable() {
+		try {
+			String sql = "SELECT * FROM note WHERE id = ?";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, LoginSession.loginId);
+			ResultSet rs = pstmt.executeQuery();
+			setTableFromDB(rs);
+			rs.close();
+			pstmt.close();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	private void setTableFromDB(ResultSet rs) throws SQLException {
+		ResultSetMetaData metaData = rs.getMetaData();
+		int cnt = metaData.getColumnCount();
+		Vector<String> columnNames = new Vector<String>();
+		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+
+		for (int i = 1; i <= cnt; i++) {
+			columnNames.add(metaData.getColumnName(i));
+		}
+
+		while (rs.next()) {
+			Vector<Object> row = new Vector<Object>();
+			for (int i = 1; i <= cnt; i++) {
+				row.add(rs.getObject(i));
+			}
+			data.add(row);
+		}
+
+		tableModel.setDataVector(data, columnNames);
 	}
 
 	public JFrame getFrame() {

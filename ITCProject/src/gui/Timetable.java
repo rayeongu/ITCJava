@@ -109,12 +109,20 @@ public class Timetable {
 				Note note = new Note();
 				note.getFrame().setLocationRelativeTo(null);
 				note.getFrame().setVisible(true);
+				frame.setVisible(false);
 			}
 		});
 		toolBar.add(btnNote);
 		toolBar.addSeparator();
 
 		JButton btnStudentInfo = new JButton("회원정보");
+		btnStudentInfo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				StudentInfo studentInfo = new StudentInfo();
+				studentInfo.getFrame().setLocationRelativeTo(null);
+				studentInfo.getFrame().setVisible(true);
+			}
+		});
 		toolBar.add(btnStudentInfo);
 		toolBar.addSeparator();
 
