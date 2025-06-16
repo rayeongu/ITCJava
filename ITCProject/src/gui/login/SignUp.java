@@ -31,9 +31,6 @@ public class SignUp {
 	private boolean isIdChecked = false;
 	private String checkedId = "";
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -48,17 +45,11 @@ public class SignUp {
 		});
 	}
 
-	/**
-	 * Create the application.
-	 */
 	public SignUp() {
 		initialize();
 		conn = DBConn.init();
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	private void initialize() {
 		frame = new JFrame();
 		frame.setTitle("회원가입");
