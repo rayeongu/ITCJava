@@ -29,6 +29,7 @@ public class SignUp {
 	private Connection conn;
 
 	private boolean isIdChecked = false;
+	private String checkedId = "";
 
 	/**
 	 * Launch the application.
@@ -86,8 +87,12 @@ public class SignUp {
 
 					if (rs.next()) {
 						JOptionPane.showMessageDialog(frame, "이미 존재하는 학번입니다.");
+						isIdChecked = false;
+						checkedId = "";
 					} else {
 						JOptionPane.showMessageDialog(frame, "사용 가능한 학번입니다.");
+						isIdChecked = true;
+						checkedId = tfId.getText();
 					}
 
 					rs.close();
@@ -140,8 +145,8 @@ public class SignUp {
 		JButton btnSignUp = new JButton("회원가입");
 		btnSignUp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (!isIdChecked) {
-					JOptionPane.showMessageDialog(frame, "중복확인을 먼c저 진행하세요.");
+				if (!isIdChecked || !tfId.getText().equals(checkedId)) {
+					JOptionPane.showMessageDialog(frame, "중복확인을 먼저 진행하세요.");
 					return;
 				}
 
