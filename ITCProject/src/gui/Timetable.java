@@ -36,6 +36,7 @@ import gui.course.AddCourseDialog;
 import gui.course.EditCourseDialog;
 import gui.login.Login;
 import gui.login.LoginSession;
+import gui.note.Note;
 
 public class Timetable {
 
@@ -103,6 +104,13 @@ public class Timetable {
 		toolBar.addSeparator();
 
 		JButton btnNote = new JButton("노트 관리");
+		btnNote.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Note note = new Note();
+				note.getFrame().setLocationRelativeTo(null);
+				note.getFrame().setVisible(true);
+			}
+		});
 		toolBar.add(btnNote);
 		toolBar.addSeparator();
 
